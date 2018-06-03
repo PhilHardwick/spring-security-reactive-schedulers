@@ -1,0 +1,62 @@
+buildscript {
+	ext {
+		springBootVersion = '2.0.2.RELEASE'
+	}
+	repositories {
+		mavenCentral()
+	}
+	dependencies {
+		classpath("org.springframework.boot:spring-boot-gradle-plugin:${springBootVersion}")
+	}
+}
+
+plugins {
+	id "com.github.lkishalmi.gatling" version "0.7.3"
+}
+
+apply plugin: "com.github.lkishalmi.gatling"
+
+gatling {
+	toolVersion = '2.3.0'
+	scalaVersion = '2.12.3'
+	simulations = {
+		include "**/*GatlingTest.scala"
+	}
+}
+
+dependencies {
+//    Force netty version 4.0 for gatling rather than resolved version: 4.1
+	gatlingRuntime 'io.netty:netty-all:4.0.51.Final'
+	gatlingCompile "commons-io:commons-io:2.6"
+}
+
+
+apply plugin: 'java'
+apply plugin: 'org.springframework.boot'
+apply plugin: 'io.spring.dependency-management'
+
+group = 'com.example'
+version = '0.0.1-SNAPSHOT'
+sourceCompatibility = 1.8
+
+repositories {
+	mavenCentral()
+}
+
+if (project.hasProperty('elastic')) {
+	bootRun {
+		jvmArgs = [ "-Dapplication.elastic=true"]
+	}
+} else {
+	bootRun {
+		jvmArgs = []
+	}
+}
+
+dependencies {
+	compile('org.springframework.boot:spring-boot-starter-security')
+	compile('org.springframework.boot:spring-boot-starter-webflux')
+	testCompile('org.springframework.boot:spring-boot-starter-test')
+	testCompile('io.projectreactor:reactor-test')
+	testCompile('org.springframework.security:spring-security-test')
+}
